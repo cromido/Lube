@@ -16,11 +16,11 @@ defmodule Mollie do
     payload = encode!(params)
     case Http.post(@base_url <> "/payments", payload, @headers) do
       {:ok, %Http.Response{status_code: 201, body: body}} ->                    # HTTP 201 CREATED
-        IO.inspect(decode! body)
+        {:ok, decode! body}
       {:ok, %Http.Response{status_code: 422, body: body}} ->                    # HTTP 422 UNPROCESSABLE ENTITY
-        IO.inspect(decode! body)
+        {:error, decode! body}
       {:error, %Http.Error{reason: reason}} ->
-        IO.inspect reason
+        {:error, reason}
     end
   end
 
