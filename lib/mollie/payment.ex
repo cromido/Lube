@@ -1,8 +1,9 @@
 defmodule Mollie.Payment do
 
-  @redirectUrl  "http://www.example.com/payments/redirect"
-  @webhookUrl   "http://www.example.com/payments/webhook"
+  @redirectUrl  Application.get_env(:lube, :redirect_url)
+  @webhookUrl   Application.get_env(:lube, :webhook_url)
 
+  @derive [Poison.Encoder]
   defstruct [
     :amount,
     :description,

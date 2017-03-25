@@ -1,12 +1,27 @@
 defmodule Mollie do
 
-  @base_url   "https://api.mollie/nl/v1"            # Take default from config
-  @api_key    "test_ur5xrbP7d8SuwvgxzqnU5x52JE8JVr" # Take default from config
+  @base_url   Application.get_env(:lube, :base_url)
+  @api_key    Application.get_env(:lube, :api_key)
+
+  # Headers as follows:
+  #   -H "Authorization: Bearer test_dHar4XY7LxsDOtmnkVtjNVWXLSlXsM"
+  @headers    [{"Authorization", "Bearer " <> @api_key} ]
+
+  alias HTTPoison, as: Http
+  import Poison, only: [encode!: 1, decode!: 1]
 
   alias Mollie.Payment
 
-  def post(payload=%Payment{}) do
-
+  def post(params=%Payment{}) do
+    payload = encode!(params)
+    case Http.post(@base_url <> "/payments", payload, @headers) do
+      {:ok, %Http.Response{status_code: 201, body: body}} ->                    # HTTP 201 CREATED
+        IO.inspect(decode! body)
+      {:ok, %Http.Response{status_code: 422, body: body}} ->                    # HTTP 422 UNPROCESSABLE ENTITY
+        IO.inspect(decode! body)
+      {:error, %Http.Error{reason: reason}} ->
+        IO.inspect reason
+    end
   end
 
 end

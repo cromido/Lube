@@ -9,6 +9,7 @@ defmodule Lube.API.Payments do
     |> Mollie.post
 
     conn
+    |> send_resp(200, "OK")
   end
 
   def split(conn) do
@@ -18,5 +19,6 @@ defmodule Lube.API.Payments do
 
   def finish(conn) do
     conn
+    |> send_resp(200, "OK")
   end
 end

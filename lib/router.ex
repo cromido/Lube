@@ -2,7 +2,11 @@ defmodule Lube.Router do
   use Plug.Router
 
   plug :match
+  plug Plug.Logger
   plug :dispatch
+
+  # Perhaps restrict to dev environment only
+  # plug Plug.Logger, log: :debug
 
   # Payment initialisation, referral, webhook, redirect
   import Lube.API.Payments, only: [create: 1, split: 1, finish: 1]
