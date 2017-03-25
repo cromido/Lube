@@ -14,9 +14,12 @@ defmodule Lube.Router do
   post "/payments/webhook", do: split(conn)
   get "/payments/redirect", do: finish(conn)
 
-  # Hello, World!
-  import Lube.HelloWorld, only: [hello_world: 1]
-  get "/", do: hello_world(conn)
+  # Home
+  get "/" do
+    conn
+    |> put_resp_header("location", Application.get_env(:lube, :homepage))
+    |> send_resp(303, "SEE OTHER")
+  end
 
   # 404 Not Found
   match _, do: send_resp(conn, 404, "404 Not Found")
