@@ -1,6 +1,8 @@
 defmodule Lube.API.Payments do
   import Plug.Conn
 
+  import Poison, only: [encode!: 1]
+
   alias Mollie
   alias Mollie.Payment
 
@@ -10,12 +12,40 @@ defmodule Lube.API.Payments do
 
     case re do
       {:ok, _body=%{"links" => %{"paymentUrl" => url}}} ->
+        # Perhaps prepare EEX JSON responses?
+        response = %{
+          "messages" => [
+            %{
+              "attachment" => %{
+                "type" => "template",
+                "payload" => %{
+                  "template_type" => "button",
+                  "text" => "Cool, I've prepared a €10.00 top-up. Ready to go to the check-out?",
+                  "buttons" => [
+                    %{
+                      "type": "web_url",
+                      "url": url,
+                      "title": "Let's go"
+                    },
+                    %{
+                      "type": "show_block",
+                      "block_name": "Cancel",
+                      "title": "Cancel"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+
         conn
         |> put_resp_header("location", url)
-        |> send_resp(303, "SEE OTHER")
+        |> send_resp(200, encode! response)
 
       {:error, error} ->
         IO.inspect error
+        # Return a neat error message
         conn
         |> send_resp(500, "INTERNAL SERVER ERROR")
     end
